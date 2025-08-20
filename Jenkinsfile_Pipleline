@@ -1,0 +1,42 @@
+pipeline{
+ agent any
+ tools{
+    maven 'MAVEN'
+    jdk 'Java17'
+ 
+ }
+ 
+    stages {
+        stage('Clone') {
+      	     steps{
+		     git poll: false, url: 'https://github.com/NaveenNave-hub/ci-vprofile-sample.git'
+		    }
+		}
+	    stage('Build') {
+	         steps{
+		     bat 'mvn clean package'
+		    }
+	    }
+	    stage('Test') {
+	         steps{
+		     bat 'mvn clean install'
+		    }
+	    }
+	    stage('Depoly'){
+	         steps{
+		     deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '5d125832-9f17-4321-abcc-2f0804f0cbde', 
+		     path: '', url: 'http://localhost:8081/')], contextPath: '/DepolyPipeLine', onFailure: false, war: '**/*.war'
+		    }
+	    }
+		 
+   }
+    post{
+	    success{
+		   echo 'pipeline fineshed successfully'
+		}
+		failure{
+		   echo 'pipleline failed'
+		}
+	 }
+}
+
